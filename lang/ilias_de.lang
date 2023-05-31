@@ -1,0 +1,20 @@
+//
+// GPLv3, see LICENSE
+//
+// @author Fadi Asbih <asbih@elsa.uni-hannover.de>
+// @version $Id$
+//
+
+<!-- language file start -->
+custom_check_user_accounts#:#Anpassbar - Benutzerzugänge überprüfen
+cron_description#:#Wenn eingeschaltet, werden alle Benutzer, deren Zugang zeitlich begrenzt ist, zwei Wochen vor Ablauf darüber informiert. Außerdem werden alle Benutzer gelöscht, die ihren Zugang nach einer Neuanmeldung mit E-Mail-Bestätigungslink nicht fristgerecht aktiviert haben.
+mail_subject_caption#:#E-Mail Betreff
+mail_subject_info#:#Betreff für den Mail
+mail_subject_content#:#Konto läuft ab
+mail_body_caption#:#E-Mail Nachricht
+mail_body_info#:#Diese Variablen 'FIRSTNAME' 'LASTNAME' 'USERNAME' 'EMAIL' 'EXPIRES' können benutzt werden
+mail_body_content#:#Hallo {FIRSTNAME} {LASTNAME}, Ihr Konto {USERNAME} ({EMAIL}) läuft ab am: {EXPIRES}
+language_selection#:#Sprachauswahl
+language#:#Sprache
+english#:#Englisch
+german#:#Deutsch

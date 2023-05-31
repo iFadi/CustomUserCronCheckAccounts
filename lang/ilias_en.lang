@@ -1,0 +1,20 @@
+//
+// GPLv3, see LICENSE
+//
+// @author Fadi Asbih <asbih@elsa.uni-hannover.de>
+// @version $Id$
+//
+
+<!-- language file start -->
+custom_check_user_accounts#:#Customizable - Check user accounts
+cron_description#:#If enabled, all users whose account expires will be informed by a customizable e-mail two weeks before. Furthermore all users which have not confirmed their account after a registration with e-mail confirmation will be deleted.
+mail_subject_caption#:#E-Mail Subject
+mail_subject_info#:#Subject for the email
+mail_subject_content#:#Limited Account
+mail_body_caption#:#E-Mail Message
+mail_body_info#:#z.B. This Variables 'FIRSTNAME' 'LASTNAME' 'USERNAME' 'EMAIL' 'EXPIRES' can be used
+mail_body_content#:#Hi {FIRSTNAME} {LASTNAME}, Your Account {USERNAME} ({EMAIL}) expires on: {EXPIRES}
+language_selection#:#Language Selection
+language#:#Language
+english#:#English
+german#:#German
