@@ -19,7 +19,6 @@ class ilCustomUserCronCheckAccountsPlugin extends ilCronHookPlugin
     {
         global $DIC;
 
-        $this->logger = $DIC->logger()->auth();
         $this->settings = $DIC->settings();
 
         parent::__construct();
@@ -74,7 +73,7 @@ class ilCustomUserCronCheckAccountsPlugin extends ilCronHookPlugin
             . $db->quote($this->getId(), "text");
         $db->manipulate($query);
 
-        $this->logger->debug('Removing custom_acc_exp_cron from cron_job table');
+        ilLoggerFactory::getRootLogger()->debug('Removing custom_acc_exp_cron from cron_job table');
 
         // Delete settings
         $settings = new ilSetting(self::PLUGIN_ID);
@@ -83,7 +82,7 @@ class ilCustomUserCronCheckAccountsPlugin extends ilCronHookPlugin
         $settings->delete('mail_subject_de');
         $settings->delete('mail_body_de');
 
-        $this->logger->debug('Deleting the settings');
+        ilLoggerFactory::getRootLogger()->debug('Deleting the settings');
 
         return true;
     }
@@ -105,7 +104,7 @@ class ilCustomUserCronCheckAccountsPlugin extends ilCronHookPlugin
         $settings->set('mail_subject_en', ilCustomUserCronCheckAccountsPlugin::getInstance()->txt("mail_subject_content", 'en'));
         $settings->set('mail_body_en', ilCustomUserCronCheckAccountsPlugin::getInstance()->txt("mail_body_content", 'en'));
 
-        $this->logger->debug('Installing: loading plugin settings: mail_subject_de, mail_body_de, mail_subject_en, mail_body_de');
+        ilLoggerFactory::getRootLogger()->debug('Installing: loading plugin settings: mail_subject_de, mail_body_de, mail_subject_en, mail_body_de');
 
     }
 
