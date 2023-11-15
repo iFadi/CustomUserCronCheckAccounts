@@ -60,7 +60,7 @@ class ilCustomUserCronCheckAccountsPlugin extends ilCronHookPlugin
         return new ilCustomUserCronCheckAccounts($settings);
     }
 
-    protected function beforeUninstall()
+    protected function beforeUninstall(): bool
     {
         global $DIC;
 
@@ -88,7 +88,7 @@ class ilCustomUserCronCheckAccountsPlugin extends ilCronHookPlugin
         return true;
     }
 
-    protected function afterActivation()
+    protected function afterActivation(): void
     {
         global $DIC;
 
@@ -108,7 +108,7 @@ class ilCustomUserCronCheckAccountsPlugin extends ilCronHookPlugin
         $this->logger->debug('Installing: loading plugin settings: mail_subject_de, mail_body_de, mail_subject_en, mail_body_de');
 
 
-        return true;
+        return;
     }
 
 //public function activate()

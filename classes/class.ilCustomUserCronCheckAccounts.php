@@ -16,48 +16,48 @@ class ilCustomUserCronCheckAccounts extends ilCronJob
         $this->settings = $settings;
     }
 
-    public function getId()
+    public function getId(): string
     {
         return self::PLUGIN_ID;
     }
 
-    public function getTitle()
+    public function getTitle(): string
     {
         return ilCustomUserCronCheckAccountsPlugin::getInstance()->txt(self::CRON_NAME);
     }
 
-    public function getDescription()
+    public function getDescription(): string
     {
         return ilCustomUserCronCheckAccountsPlugin::getInstance()->txt("cron_description");
     }
 
-    public function run()
+    public function run(): ilCronJobResult
     {
         $customUserCronCheckAccounts = new CustomUserCronCheckAccounts($this->settings);
         return $customUserCronCheckAccounts->run();
     }
 
-    public function hasAutoActivation()
+    public function hasAutoActivation(): bool
     {
         return false;
     }
 
-    public function hasFlexibleSchedule()
+    public function hasFlexibleSchedule(): bool
     {
         return false;
     }
 
-    public function getDefaultScheduleType()
+    public function getDefaultScheduleType(): int
     {
         return self::SCHEDULE_TYPE_DAILY;
     }
 
-    public function getDefaultScheduleValue()
+    public function getDefaultScheduleValue(): int
     {
         return 1;
     }
 
-    public function hasCustomSettings()
+    public function hasCustomSettings(): bool
     {
         return true;
     }
@@ -68,7 +68,7 @@ class ilCustomUserCronCheckAccounts extends ilCronJob
      * @param ilPropertyFormGUI $a_form
      * @throws ilDateTimeException
      */
-    public function addCustomSettingsToForm(ilPropertyFormGUI $a_form)
+    public function addCustomSettingsToForm(ilPropertyFormGUI $a_form): void
     {
         // Language selection
         $language_section = new ilFormSectionHeaderGUI();
@@ -121,7 +121,7 @@ class ilCustomUserCronCheckAccounts extends ilCronJob
 
 
 
-    public function saveCustomSettings(ilPropertyFormGUI $a_form)
+    public function saveCustomSettings(ilPropertyFormGUI $a_form): bool
     {
         $this->settings->set('mail_subject_de', $a_form->getInput('mail_subject_de'));
         $this->settings->set('mail_body_de', $a_form->getInput('mail_body_de'));
@@ -134,7 +134,7 @@ class ilCustomUserCronCheckAccounts extends ilCronJob
 
 class CustomUserCronCheckAccounts extends ilUserCronCheckAccounts
 {
-    public function run()
+    public function run(): ilCronJobResult
     {
         global $DIC;
 
