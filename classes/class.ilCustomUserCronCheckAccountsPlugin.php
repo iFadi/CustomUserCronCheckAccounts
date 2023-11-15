@@ -107,8 +107,6 @@ class ilCustomUserCronCheckAccountsPlugin extends ilCronHookPlugin
 
         $this->logger->debug('Installing: loading plugin settings: mail_subject_de, mail_body_de, mail_subject_en, mail_body_de');
 
-
-        return;
     }
 
 //public function activate()
