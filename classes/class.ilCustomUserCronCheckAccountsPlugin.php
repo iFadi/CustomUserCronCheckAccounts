@@ -2,7 +2,7 @@
 
 require_once 'class.ilCustomUserCronCheckAccounts.php';
 
-class ilCustomUserCronCheckAccountsPlugin extends ilCronHookPlugin implements ilCronJobProvider
+class ilCustomUserCronCheckAccountsPlugin extends ilCronHookPlugin implements ilCronJob
 {
     public const PLUGIN_CLASS_NAME = ilCustomUserCronCheckAccountsPlugin::class;
     public const PLUGIN_ID = 'custom_acc_exp_cron';
