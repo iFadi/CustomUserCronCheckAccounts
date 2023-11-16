@@ -52,7 +52,7 @@ class ilCustomUserCronCheckAccountsPlugin extends ilCronHookPlugin
         return [new ilCustomUserCronCheckAccounts($settings)];
     }
 
-    public function getCronJobInstance($a_job_id): ilCustomUserCronCheckAccounts
+    public function getCronJobInstance($a_job_id): ilCronJobRepository
     {
         global $DIC;
         $settings = new ilSetting(self::PLUGIN_ID);
