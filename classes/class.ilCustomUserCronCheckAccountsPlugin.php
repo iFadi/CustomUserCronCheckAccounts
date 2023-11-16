@@ -45,12 +45,13 @@ class ilCustomUserCronCheckAccountsPlugin extends ilCronHookPlugin implements il
         return self::PLUGIN_NAME;
     }
 
-    public function getCronJobInstance(string $jobId): array
+    public function getCronJobInstance(string $jobId): ilCronJob
     {
         global $DIC;
         $settings = new ilSetting(self::PLUGIN_ID);
         return new ilCustomUserCronCheckAccounts($settings);
     }
+
 
 
     protected function beforeUninstall(): bool
