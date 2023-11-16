@@ -64,9 +64,8 @@ class ilCustomUserCronCheckAccountsPlugin extends ilCronHookPlugin
         global $DIC;
 
         // Deactivate the cron job
-        //$cron_manager = new ilCronManager($DIC->settings(), $DIC->logger()->root());;
-        $cronJobRepository = new ilCronJobRepositoryClass(); // Use the custom repository
-        $cron_manager = new ilCronManagerImpl($cronJobRepository);
+        $cron_manager = new ilCronManager($DIC->settings(), $DIC->logger()->root());;
+        $cron_manager->deactivateJob($this->getCronJobInstance($this->getId()));
 
         $cron_manager->deactivateJob($this->getCronJobInstance($this->getId()));
 
@@ -95,9 +94,8 @@ class ilCustomUserCronCheckAccountsPlugin extends ilCronHookPlugin
         global $DIC;
 
         // Activate the cron job
-       // $cron_manager = new ilCronManagerImpl($DIC->settings(), $DIC->logger()->root());
-        $cronJobRepository = new ilCronJobRepositoryClass(); // Use the custom repository
-        $cron_manager = new ilCronManagerImpl($cronJobRepository);
+        $cron_manager = new ilCronManager($DIC->settings(), $DIC->logger()->root());
+        $cron_manager->activateJob($this->getCronJobInstance($this->getId()));
 
         $cron_manager->activateJob($this->getCronJobInstance($this->getId()));
 
