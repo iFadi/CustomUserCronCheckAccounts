@@ -94,7 +94,7 @@ class ilCustomUserCronCheckAccountsPlugin extends ilCronHookPlugin
 
         // Activate the cron job
         $cron_manager = new ilCronManagerImpl();
-        ilCronManagerImpl->activateJob($this->getCronJobInstance($this->getId()));
+        $cron_manager->activateJob($this->getCronJobInstance($this->getId()));
 
 
         // Define default settings
