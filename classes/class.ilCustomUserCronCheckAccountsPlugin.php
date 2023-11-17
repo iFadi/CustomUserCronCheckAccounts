@@ -2,7 +2,7 @@
 
 require_once 'class.ilCustomUserCronCheckAccounts.php';
 
-class ilCustomUserCronCheckAccountsPlugin extends ilCronHookPlugin implements ilCronJob
+class ilCustomUserCronCheckAccountsPlugin extends ilCronHookPlugin
 {
     public const PLUGIN_CLASS_NAME = ilCustomUserCronCheckAccountsPlugin::class;
     public const PLUGIN_ID = 'custom_acc_exp_cron';
@@ -66,8 +66,7 @@ class ilCustomUserCronCheckAccountsPlugin extends ilCronHookPlugin implements il
         global $DIC;
 
         // Deactivate the cron job
-// Assuming ilCustomUserCronCheckAccounts implements ilCronJob
-        $cron_manager = new ilCronManagerImpl($this->getCronJobInstance($this->getId()), $DIC->database(), $DIC->settings(), $DIC->logger()->root());
+        $cron_manager = new ilCronManager($DIC->settings(), $DIC->logger()->root());
         $cron_manager->deactivateJob($this->getCronJobInstance($this->getId()));
 
 
@@ -96,8 +95,7 @@ class ilCustomUserCronCheckAccountsPlugin extends ilCronHookPlugin implements il
         global $DIC;
 
         // Activate the cron job
-// Assuming ilCustomUserCronCheckAccounts implements ilCronJob
-        $cron_manager = new ilCronManagerImpl($this->getCronJobInstance($this->getId()), $DIC->database(), $DIC->settings(), $DIC->logger()->root());
+        $cron_manager = new ilCronManager($DIC->settings(), $DIC->logger()->root());
         $cron_manager->activateJob($this->getCronJobInstance($this->getId()));
 
 
