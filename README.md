@@ -33,8 +33,8 @@ After activating the plugin, a new cronjob "Customizable - Check user accounts" 
 * {EXPIRES}
 
 ## Tested on the following ILIAS Versions:
-* v7.19
-* v7.21
+* v8.0
+* v8.99
 
 ## Maintainer
 [ZQS/elsa - Leibniz Universität Hannover](https://www.zqs.uni-hannover.de/de/zqs/team-kontakt/elsa/), [elearning@uni-hannover.de](mailto:elearning@uni-hannover.de)
