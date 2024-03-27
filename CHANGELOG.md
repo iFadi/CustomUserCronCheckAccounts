@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/iFadi/CustomUserCronCheckAccounts/compare/v1.0.0...v1.0.1) (2024-03-27)
+
+
+### Bug Fixes
+
+* un/install function ([9ec7161](https://github.com/iFadi/CustomUserCronCheckAccounts/commit/9ec7161b1aa7d97dec4f43a541cda5679a3590e7))
+
 ## 1.0.0 (2024-03-27)
 
 
