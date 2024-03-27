@@ -15,14 +15,15 @@ class ilCustomUserCronCheckAccountsPlugin extends ilCronHookPlugin
 
     protected static $instance = null;
 
-    public function __construct()
+    public function __construct(\ilDBInterface $db, \ilComponentRepositoryWrite $component_repository, string $id)
     {
         global $DIC;
 
         $this->logger = $DIC->logger()->auth();
         $this->settings = $DIC->settings();
 
-        parent::__construct();
+        // Pass the required arguments to the parent constructor.
+        parent::__construct($db, $component_repository, $id);
         self::$instance = $this;
     }
 
