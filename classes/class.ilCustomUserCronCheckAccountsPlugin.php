@@ -65,9 +65,23 @@ class ilCustomUserCronCheckAccountsPlugin extends ilCronHookPlugin
     {
         global $DIC;
 
-        // Deactivate the cron job
-        $cron_manager = new ilCronManager($DIC->settings(), $DIC->logger()->root());
-        $cron_manager->deactivateJob($this->getCronJobInstance($this->getId()));
+//        // Deactivate the cron job
+//        $cron_manager = new ilCronManager($DIC->settings(), $DIC->logger()->root());
+//        $cron_manager->deactivateJob($this->getCronJobInstance($this->getId()));
+
+        // Access the cron services implementation and then the cron manager
+        $cron_services = new ilCronServicesImpl($DIC);
+        $cron_manager = $cron_services->manager();
+
+        // Retrieve the cron job instance you wish to deactivate
+        $cron_job_instance = $this->getCronJobInstance($this->getId());
+
+        // Assuming you can get the current user from the global $DIC container
+        $current_user = $DIC->user();
+
+        // Now, deactivate the job with the correct arguments
+        $cron_manager->deactivateJob($cron_job_instance, $current_user);
+
 
         // Manually remove cron job from the database
         $db = $DIC->database();
@@ -92,10 +106,21 @@ class ilCustomUserCronCheckAccountsPlugin extends ilCronHookPlugin
     protected function afterActivation(): void
     {
         global $DIC;
+        
+        // Assuming $cron_services gives you access to the cron manager as before
+        $cron_services = new ilCronServicesImpl($DIC);
+        $cron_manager = $cron_services->manager();
 
-        // Activate the cron job
-        $cron_manager = new ilCronManager($DIC->settings(), $DIC->logger()->root());
-        $cron_manager->activateJob($this->getCronJobInstance($this->getId()));
+        // Retrieve the cron job instance you wish to activate
+        $cron_job_instance = $this->getCronJobInstance($this->getId());
+
+        // Assuming you need to provide the current user as the actor
+        $current_user = $DIC->user();
+
+        // Correctly call activateJob with the required arguments
+        $cron_manager->activateJob($cron_job_instance, $current_user);
+
+
 
         // Define default settings
         $settings = new ilSetting(self::PLUGIN_ID);
