@@ -106,7 +106,7 @@ class ilCustomUserCronCheckAccountsPlugin extends ilCronHookPlugin
     protected function afterActivation(): void
     {
         global $DIC;
-        
+
         // Assuming $cron_services gives you access to the cron manager as before
         $cron_services = new ilCronServicesImpl($DIC);
         $cron_manager = $cron_services->manager();

@@ -23,6 +23,11 @@ cd Customizing/global/plugins/Services/Cron/CronHook
 git clone https://github.com/iFadi/CustomUserCronCheckAccounts.git
 ```
 
+to list the plugin under "Administration" > "Plugins", you should run in your {ILIAS Root}:
+```bash
+composer du --no-dev
+```
+
 After activating the plugin, a new cronjob "Customizable - Check user accounts" should appear. You should also deactivate the default ILIAS "Check user accounts" Cronjob.
 
 #### Parameters which can be used in the text subject/body
@@ -35,6 +40,8 @@ After activating the plugin, a new cronjob "Customizable - Check user accounts" 
 ## Tested on the following ILIAS Versions:
 * v8.0
 * v8.99
+
+PS: For older ILIAS versions, you can choose to use older tags/versions of the plugin.
 
 ## Maintainer
 [ZQS/elsa - Leibniz Universität Hannover](https://www.zqs.uni-hannover.de/de/zqs/team-kontakt/elsa/), [elearning@uni-hannover.de](mailto:elearning@uni-hannover.de)
