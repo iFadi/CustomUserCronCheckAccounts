@@ -3,7 +3,7 @@ CustomUserCronCheckAccounts is a plugin for the [ILIAS](https://www.ilias.de/) L
 to allow you to customize the email/notification message sent to the user.
 
 ## Version
-v1.0.2
+v1.0.3
 
 ## Screenshots
 * This is the default ILIAS Message
