@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.4](https://github.com/iFadi/CustomUserCronCheckAccounts/compare/v1.0.3...v1.0.4) (2024-03-28)
+
+
+### Bug Fixes
+
+* update plugin version script ([88dd0ee](https://github.com/iFadi/CustomUserCronCheckAccounts/commit/88dd0eece1bf0f901a5e1131c21a775040b9d70e))
+
 ## [1.0.3](https://github.com/iFadi/CustomUserCronCheckAccounts/compare/v1.0.2...v1.0.3) (2024-03-28)
 
 
