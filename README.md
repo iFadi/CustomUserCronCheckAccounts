@@ -37,7 +37,8 @@ to list the plugin under "Administration" > "Plugins", you should run in your {I
 composer du --no-dev
 ```
 
-After activating the plugin, a new cronjob "Customizable - Check user accounts" should appear. You should also deactivate the default ILIAS "Check user accounts" Cronjob.
+After activating the plugin, a new cronjob "Customizable - Check user accounts" should appear under "System Settings and Maintenance --> General Settings --> Cron Jobs"
+. You should also deactivate the default ILIAS "Check user accounts" Cronjob.
 
 #### Parameters which can be used in the text subject/body
 * {USERNAME}
