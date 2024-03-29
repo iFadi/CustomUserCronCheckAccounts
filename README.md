@@ -1,4 +1,13 @@
-# CustomUserCronCheckAccounts
+CustomUserCronCheckAccounts
+============
+![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/iFadi/CustomUserCronCheckAccounts?style=flat-square)
+![GitHub closed issues](https://img.shields.io/github/issues-closed/iFadi/CustomUserCronCheckAccounts?style=flat-square&color=success)
+[![GitHub issues](https://img.shields.io/github/issues/iFadi/CustomUserCronCheckAccounts?style=flat-square&color=yellow)](https://github.com/iFadi/CustomUserCronCheckAccounts/issues)
+![GitHub closed pull requests](https://img.shields.io/github/issues-pr-closed/iFadi/CustomUserCronCheckAccounts?style=flat-square&color=success)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/iFadi/CustomUserCronCheckAccounts?style=flat-square&color=yellow)
+[![GitHub forks](https://img.shields.io/github/forks/iFadi/CustomUserCronCheckAccounts?style=flat-square&color=blueviolet)](https://github.com/iFadi/CustomUserCronCheckAccounts/network)
+[![GitHub stars](https://img.shields.io/github/stars/iFadi/CustomUserCronCheckAccounts?style=flat-square&color=blueviolet)](https://github.com/iFadi/CustomUserCronCheckAccounts/stargazers)
+[![GitHub license](https://img.shields.io/github/license/iFadi/CustomUserCronCheckAccounts?style=flat-square)](https://github.com/iFadi/CustomUserCronCheckAccounts/blob/main/LICENSE)
 CustomUserCronCheckAccounts is a plugin for the [ILIAS](https://www.ilias.de/) Learning Management System, which extends the default ILIAS "check user accounts" Cronjob,
 to allow you to customize the email/notification message sent to the user.
 
