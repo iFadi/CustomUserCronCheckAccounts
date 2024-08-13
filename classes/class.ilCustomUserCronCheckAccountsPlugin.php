@@ -19,7 +19,6 @@ class ilCustomUserCronCheckAccountsPlugin extends ilCronHookPlugin
     {
         global $DIC;
 
-        $this->logger = $DIC->logger()->auth();
         $this->settings = $DIC->settings();
 
         // Pass the required arguments to the parent constructor.
@@ -36,6 +35,17 @@ class ilCustomUserCronCheckAccountsPlugin extends ilCronHookPlugin
         return self::$instance;
     }
 
+    public function getLogger()
+    {
+        if ($this->logger === null) {
+            global $DIC;
+
+            // Make sure logger is initialized lazily
+            $this->logger = $DIC->logger()->auth();
+        }
+
+        return $this->logger;
+    }
 
     public function getId(): string
     {
@@ -89,7 +99,7 @@ class ilCustomUserCronCheckAccountsPlugin extends ilCronHookPlugin
             . $db->quote($this->getId(), "text");
         $db->manipulate($query);
 
-        $this->logger->debug('Removing custom_acc_exp_cron from cron_job table');
+        $this->getLogger()->debug('Removing custom_acc_exp_cron from cron_job table');
 
         // Delete settings
         $settings = new ilSetting(self::PLUGIN_ID);
@@ -98,30 +108,13 @@ class ilCustomUserCronCheckAccountsPlugin extends ilCronHookPlugin
         $settings->delete('mail_subject_de');
         $settings->delete('mail_body_de');
 
-        $this->logger->debug('Deleting the settings');
+        $this->getLogger()->debug('Deleting the settings');
 
         return true;
     }
 
     protected function afterActivation(): void
     {
-        global $DIC;
-
-        // Assuming $cron_services gives you access to the cron manager as before
-        $cron_services = new ilCronServicesImpl($DIC);
-        $cron_manager = $cron_services->manager();
-
-        // Retrieve the cron job instance you wish to activate
-        $cron_job_instance = $this->getCronJobInstance($this->getId());
-
-        // Assuming you need to provide the current user as the actor
-        $current_user = $DIC->user();
-
-        // Correctly call activateJob with the required arguments
-        $cron_manager->activateJob($cron_job_instance, $current_user);
-
-
-
         // Define default settings
         $settings = new ilSetting(self::PLUGIN_ID);
         // For German
@@ -130,17 +123,7 @@ class ilCustomUserCronCheckAccountsPlugin extends ilCronHookPlugin
         // For English
         $settings->set('mail_subject_en', ilCustomUserCronCheckAccountsPlugin::getInstance()->txt("mail_subject_content", 'en'));
         $settings->set('mail_body_en', ilCustomUserCronCheckAccountsPlugin::getInstance()->txt("mail_body_content", 'en'));
-
-        $this->logger->debug('Installing: loading plugin settings: mail_subject_de, mail_body_de, mail_subject_en, mail_body_de');
-
-
     }
-
-//public function activate()
-//{
-    // Deactivate the default cronjob with job ID 'user_check_accounts'
-//    $this->deactivateDefaultCronJob();
-//}
 
     private function deactivateDefaultCronJob()
     {
