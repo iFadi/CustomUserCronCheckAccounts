@@ -6,8 +6,8 @@
 //
 
 <!-- language file start -->
-custom_check_user_accounts#:#Anpassbar - Benutzerzugänge überprüfen
-cron_description#:#Wenn eingeschaltet, werden alle Benutzer, deren Zugang zeitlich begrenzt ist, zwei Wochen vor Ablauf darüber informiert. Außerdem werden alle Benutzer gelöscht, die ihren Zugang nach einer Neuanmeldung mit E-Mail-Bestätigungslink nicht fristgerecht aktiviert haben.
+custom_check_user_accounts#:#Anpassbar - ILIAS-Konten überprüfen
+cron_description#:#Personen, deren ILIAS-Konten zeitlich begrenzt sind, werden zwei Wochen vor Fristende per E-Mail informiert, dass ihr Konto abläuft. Außerdem löscht der Cronjob alle ILIAS-Konten, bei denen der E-Mail-Bestätigungslink nicht fristgerecht angeklickt wurde.
 mail_subject_caption#:#E-Mail Betreff
 mail_subject_info#:#Betreff für den Mail
 mail_subject_content#:#Konto läuft ab
