@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.0.10](https://github.com/iFadi/CustomUserCronCheckAccounts/compare/v1.0.9...v1.0.10) (2024-08-13)
+
+
+### Bug Fixes
+
+* fixes [#12](https://github.com/iFadi/CustomUserCronCheckAccounts/issues/12) ([3cdf28d](https://github.com/iFadi/CustomUserCronCheckAccounts/commit/3cdf28d83e5e962ffa543e58a011dc7bc5d43a49))
+* implemented getLogger function ([f9f7c33](https://github.com/iFadi/CustomUserCronCheckAccounts/commit/f9f7c33cb311ca89ab602c7e3feb30dda2e329ac))
+* update DE language ([4da48e6](https://github.com/iFadi/CustomUserCronCheckAccounts/commit/4da48e689300841860c91f9b9dc06800845d9db8))
+
 ## [1.0.9](https://github.com/iFadi/CustomUserCronCheckAccounts/compare/v1.0.8...v1.0.9) (2024-04-01)
 
 
