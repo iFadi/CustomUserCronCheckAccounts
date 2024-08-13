@@ -115,7 +115,6 @@ class ilCustomUserCronCheckAccountsPlugin extends ilCronHookPlugin
 
     protected function afterActivation(): void
     {
-        
         // Define default settings
         $settings = new ilSetting(self::PLUGIN_ID);
         // For German
@@ -124,17 +123,7 @@ class ilCustomUserCronCheckAccountsPlugin extends ilCronHookPlugin
         // For English
         $settings->set('mail_subject_en', ilCustomUserCronCheckAccountsPlugin::getInstance()->txt("mail_subject_content", 'en'));
         $settings->set('mail_body_en', ilCustomUserCronCheckAccountsPlugin::getInstance()->txt("mail_body_content", 'en'));
-
-//        $this->logger->debug('Installing: loading plugin settings: mail_subject_de, mail_body_de, mail_subject_en, mail_body_de');
-
-
     }
-
-//public function activate()
-//{
-    // Deactivate the default cronjob with job ID 'user_check_accounts'
-//    $this->deactivateDefaultCronJob();
-//}
 
     private function deactivateDefaultCronJob()
     {
