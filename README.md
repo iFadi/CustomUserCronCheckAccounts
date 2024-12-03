@@ -48,8 +48,8 @@ After activating the plugin, a new cronjob "Customizable - Check user accounts" 
 * {EXPIRES}
 
 ## Tested on the following ILIAS Versions:
-* v8.0
-* v8.99
+* v9.0
+* v9.99
 
 PS: For older ILIAS versions, you can choose to use older tags/versions of the plugin.
 
