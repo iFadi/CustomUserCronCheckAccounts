@@ -1,6 +1,8 @@
 <?php
 
-require_once './Services/User/classes/class.ilUserCronCheckAccounts.php';
+use ILIAS\Cron\Schedule\CronJobScheduleType;
+
+require_once 'class.ilCustomUserCronCheckAccounts.php';
 require_once './Services/Cron/classes/class.ilCronJob.php';
 require_once './Services/Logging/classes/class.ilLog.php';
 
@@ -47,9 +49,9 @@ class ilCustomUserCronCheckAccounts extends ilCronJob
         return false;
     }
 
-    public function getDefaultScheduleType(): int
+    public function getDefaultScheduleType(): CronJobScheduleType
     {
-        return self::SCHEDULE_TYPE_DAILY;
+        return CronJobScheduleType::SCHEDULE_TYPE_DAILY;
     }
 
     public function getDefaultScheduleValue(): int
