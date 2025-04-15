@@ -142,7 +142,6 @@ class CustomUserCronCheckAccounts extends ilUserCronCheckAccounts
 
         $ilDB = $DIC['ilDB'];
         $ilLog = $DIC['ilLog'];
-        $lng = $DIC['lng'];
 
         $status = ilCronJobResult::STATUS_NO_ACTION;
 
@@ -150,7 +149,7 @@ class CustomUserCronCheckAccounts extends ilUserCronCheckAccounts
         $two_weeks_in_seconds = $now + (60 * 60 * 24 * 14); // #14630
 
         // all users who are currently active and expire in the next 2 weeks
-        $query = "SELECT * FROM usr_data,usr_pref " .
+        $query = "SELECT * FROM usr_data, usr_pref " .
             "WHERE time_limit_message = '0' " .
             "AND time_limit_unlimited = '0' " .
             "AND time_limit_from < " . $ilDB->quote($now, "integer") . " " .
@@ -161,37 +160,38 @@ class CustomUserCronCheckAccounts extends ilUserCronCheckAccounts
 
         $res = $ilDB->query($query);
 
-        /** @var ilMailMimeSenderFactory $senderFactory */
-        $senderFactory = $GLOBALS['DIC']["mail.mime.sender.factory"];
-        $sender = $senderFactory->system();
+        $mailService = new ilMail(ANONYMOUS_USER_ID);
 
         while ($row = $ilDB->fetchObject($res)) {
-            include_once 'Services/Mail/classes/class.ilMimeMail.php';
+            $data = [
+                "firstname" => $row->firstname,
+                "lastname" => $row->lastname,
+                "expires" => $row->time_limit_until,
+                "email" => $row->email,
+                "login" => $row->login,
+                "usr_id" => $row->usr_id,
+                "language" => $row->value,
+                "owner" => $row->time_limit_owner,
+            ];
 
-            $data["firstname"] = $row->firstname;
-            $data["lastname"] = $row->lastname;
-            $data['expires'] = $row->time_limit_until;
-            $data['email'] = $row->email;
-            $data['login'] = $row->login;
-            $data['usr_id'] = $row->usr_id;
-            $data['language'] = $row->value;
-            $data['owner'] = $row->time_limit_owner;
+            $subject = $this->getCustomEmailSubject($data);
+            $body = $this->getCustomEmailBody($data);
 
-            // Send mail
-            $mail = new ilMimeMail();
-
-            $mail->From($sender);
-            $mail->To($data['email']);
-
-            $mail->Subject($this->getCustomEmailSubject($data));
-            $mail->Body($this->getCustomEmailBody($data));
-            $mail->send();
+            // Send mail using ilMail enqueue (which is CLI/cron safe)
+            $mailService->enqueue(
+                $data['email'], // to
+                '',             // cc
+                '',             // bcc
+                $subject,
+                $body,
+                []              // attachments
+            );
 
             // set status 'mail sent'
-            $query = "UPDATE usr_data SET time_limit_message = '1' WHERE usr_id = '" . $data['usr_id'] . "'";
-            $ilDB->query($query);
+            $update = "UPDATE usr_data SET time_limit_message = '1' WHERE usr_id = " . $ilDB->quote($data['usr_id'], 'integer');
+            $ilDB->query($update);
 
-            // Send log message
+            // Log mail activity
             $ilLog->write('Cron: (checkUserAccounts()) sent message to ' . $data['login'] . '.');
 
             $this->counter++;
@@ -202,6 +202,7 @@ class CustomUserCronCheckAccounts extends ilUserCronCheckAccounts
         if ($this->counter) {
             $status = ilCronJobResult::STATUS_OK;
         }
+
         $result = new ilCronJobResult();
         $result->setStatus($status);
         return $result;
