@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.12](https://github.com/iFadi/CustomUserCronCheckAccounts/compare/v1.0.11...v1.0.12) (2025-04-15)
+
+
+### Bug Fixes
+
+* resolves [#17](https://github.com/iFadi/CustomUserCronCheckAccounts/issues/17) ([90c5263](https://github.com/iFadi/CustomUserCronCheckAccounts/commit/90c526341803a825d98294f984b558f1ca131cfd))
+
 ## [1.0.11](https://github.com/iFadi/CustomUserCronCheckAccounts/compare/v1.0.10...v1.0.11) (2024-12-03)
 
 
