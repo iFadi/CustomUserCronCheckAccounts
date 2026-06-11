@@ -4,7 +4,7 @@
 $id = "custom_acc_exp_cron";
 
 // code version; managed by release-please / update_plugin_version.sh on release
-$version = "1.0.12";
+$version = "2.0.0";
 
 // ilias min and max version; must always reflect the versions that
 // should run with the plugin
