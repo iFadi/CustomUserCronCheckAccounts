@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.0](https://github.com/iFadi/CustomUserCronCheckAccounts/compare/v1.0.12...v2.0.0) (2026-06-11)
+
+
+### ⚠ BREAKING CHANGES
+
+* requires ILIAS 10; no longer compatible with ILIAS 9. ILIAS 9 users should stay on the v1.x releases.
+
+### Features
+
+* port plugin to ILIAS 10 ([8dba9bb](https://github.com/iFadi/CustomUserCronCheckAccounts/commit/8dba9bb1fbaf2b1019e4bb349d5f0957499a7549))
+
 ## [1.0.12](https://github.com/iFadi/CustomUserCronCheckAccounts/compare/v1.0.11...v1.0.12) (2025-04-15)
 
 
