@@ -1,150 +1,81 @@
 <?php
 
-require_once 'class.ilCustomUserCronCheckAccounts.php';
+declare(strict_types=1);
 
+/**
+ * CustomUserCronCheckAccounts – ILIAS 10 plugin entry point.
+ *
+ * Extends the core "Check user accounts" cron job (id: user_check_accounts)
+ * with freely configurable, per-language notification mails that support the
+ * placeholders {FIRSTNAME} {LASTNAME} {USERNAME} {EMAIL} {EXPIRES}. The core
+ * job can only send a fixed, language-variable based text without the actual
+ * expiry date, which is why this plugin is still required under ILIAS 10.
+ *
+ * @author Fadi Asbih <asbih@elsa.uni-hannover.de>
+ */
 class ilCustomUserCronCheckAccountsPlugin extends ilCronHookPlugin
 {
-    public const PLUGIN_CLASS_NAME = ilCustomUserCronCheckAccountsPlugin::class;
     public const PLUGIN_ID = 'custom_acc_exp_cron';
     public const PLUGIN_NAME = 'CustomUserCronCheckAccounts';
-
-    /**
-     * @var null | \ilLogger
-     */
-    private $logger = null;
-
-    protected static $instance = null;
-
-    public function __construct(\ilDBInterface $db, \ilComponentRepositoryWrite $component_repository, string $id)
-    {
-        global $DIC;
-
-        $this->settings = $DIC->settings();
-
-        // Pass the required arguments to the parent constructor.
-        parent::__construct($db, $component_repository, $id);
-        self::$instance = $this;
-    }
-
-    public static function getInstance(): ?ilCustomUserCronCheckAccountsPlugin
-    {
-        if (self::$instance === null) {
-            self::$instance = new ilCustomUserCronCheckAccountsPlugin();
-        }
-
-        return self::$instance;
-    }
-
-    public function getLogger()
-    {
-        if ($this->logger === null) {
-            global $DIC;
-
-            // Make sure logger is initialized lazily
-            $this->logger = $DIC->logger()->auth();
-        }
-
-        return $this->logger;
-    }
-
-    public function getId(): string
-    {
-        return self::PLUGIN_ID;
-    }
 
     public function getPluginName(): string
     {
         return self::PLUGIN_NAME;
     }
 
+    /**
+     * @return ilCronJob[]
+     */
     public function getCronJobInstances(): array
     {
-        global $DIC;
-        $settings = new ilSetting(self::PLUGIN_ID);
-        return [new ilCustomUserCronCheckAccounts($settings)];
+        return [$this->getCronJobInstance(self::PLUGIN_ID)];
     }
 
-    public function getCronJobInstance($a_job_id): ilCustomUserCronCheckAccounts
+    public function getCronJobInstance(string $jobId): ilCronJob
     {
-        global $DIC;
-        $settings = new ilSetting(self::PLUGIN_ID);
-        return new ilCustomUserCronCheckAccounts($settings);
+        // The job receives the plugin so it can resolve language strings via
+        // $this->plugin->txt() instead of a fragile static singleton.
+        return new ilCustomUserCronCheckAccounts($this);
     }
 
-    protected function beforeUninstall(): bool
-    {
-        global $DIC;
-
-//        // Deactivate the cron job
-//        $cron_manager = new ilCronManager($DIC->settings(), $DIC->logger()->root());
-//        $cron_manager->deactivateJob($this->getCronJobInstance($this->getId()));
-
-        // Access the cron services implementation and then the cron manager
-        $cron_services = new ilCronServicesImpl($DIC);
-        $cron_manager = $cron_services->manager();
-
-        // Retrieve the cron job instance you wish to deactivate
-        $cron_job_instance = $this->getCronJobInstance($this->getId());
-
-        // Assuming you can get the current user from the global $DIC container
-        $current_user = $DIC->user();
-
-        // Now, deactivate the job with the correct arguments
-        $cron_manager->deactivateJob($cron_job_instance, $current_user);
-
-
-        // Manually remove cron job from the database
-        $db = $DIC->database();
-        $query = "DELETE FROM cron_job WHERE job_id = "
-            . $db->quote($this->getId(), "text");
-        $db->manipulate($query);
-
-        $this->getLogger()->debug('Removing custom_acc_exp_cron from cron_job table');
-
-        // Delete settings
-        $settings = new ilSetting(self::PLUGIN_ID);
-        $settings->delete('mail_subject_en');
-        $settings->delete('mail_body_en');
-        $settings->delete('mail_subject_de');
-        $settings->delete('mail_body_de');
-
-        $this->getLogger()->debug('Deleting the settings');
-
-        return true;
-    }
-
+    /**
+     * Seed the per-language default mail texts the first time the plugin is
+     * activated.
+     *
+     * NB: ilPlugin::txt() in ILIAS 10 takes no language argument – it always
+     * returns the current UI language. Seeding the German defaults via txt()
+     * (as the ILIAS 9 version did) therefore leaked the admin's UI language
+     * into the German field. We seed from explicit, language-keyed constants
+     * instead, so "de" is always German and "en" is always English.
+     * Existing (already configured) values are never overwritten.
+     */
     protected function afterActivation(): void
     {
-        // Define default settings
         $settings = new ilSetting(self::PLUGIN_ID);
-        // For German
-        $settings->set('mail_subject_de', ilCustomUserCronCheckAccountsPlugin::getInstance()->txt("mail_subject_content", 'de'));
-        $settings->set('mail_body_de', ilCustomUserCronCheckAccountsPlugin::getInstance()->txt("mail_body_content", 'de'));
-        // For English
-        $settings->set('mail_subject_en', ilCustomUserCronCheckAccountsPlugin::getInstance()->txt("mail_subject_content", 'en'));
-        $settings->set('mail_body_en', ilCustomUserCronCheckAccountsPlugin::getInstance()->txt("mail_body_content", 'en'));
+
+        foreach (ilCustomUserCronCheckAccounts::SUPPORTED_LANGUAGES as $lang) {
+            if ((string) $settings->get('mail_subject_' . $lang, '') === '') {
+                $settings->set('mail_subject_' . $lang, ilCustomUserCronCheckAccounts::DEFAULT_SUBJECT[$lang]);
+            }
+            if ((string) $settings->get('mail_body_' . $lang, '') === '') {
+                $settings->set('mail_body_' . $lang, ilCustomUserCronCheckAccounts::DEFAULT_BODY[$lang]);
+            }
+        }
     }
 
-    private function deactivateDefaultCronJob()
+    /**
+     * Remove the plugin's settings on uninstall. The cron job row itself is
+     * cleaned up by the ILIAS cron/plugin machinery.
+     */
+    protected function beforeUninstall(): bool
     {
-        global $DIC;
+        $settings = new ilSetting(self::PLUGIN_ID);
 
-        $job_id = 'user_check_accounts';
-
-        // Get the cron manager
-        $cron_manager = new ilCronManager($DIC->settings(), $DIC->logger()->root());
-
-//    $cron_manager = $DIC->cronManager();
-
-        // Get the cronjob object
-        $cronjob = $cron_manager->getJobInstanceById($job_id);
-//    $isJobActive = $cron_manager->isJobActive($job_id);
-
-        if ($cronjob) {
-            // Deactivate the cronjob
-            //$cronjob->setActivation(false);
-            //$cronjob->update();
-            $cron_manager->deactivateJob($cronjob);
+        foreach (ilCustomUserCronCheckAccounts::SUPPORTED_LANGUAGES as $lang) {
+            $settings->delete('mail_subject_' . $lang);
+            $settings->delete('mail_body_' . $lang);
         }
+
+        return true;
     }
 }

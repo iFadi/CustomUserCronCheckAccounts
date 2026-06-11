@@ -1,42 +1,65 @@
 <?php
 
+declare(strict_types=1);
+
 use ILIAS\Cron\Schedule\CronJobScheduleType;
 
-require_once 'class.ilCustomUserCronCheckAccounts.php';
-require_once './Services/Cron/classes/class.ilCronJob.php';
-require_once './Services/Logging/classes/class.ilLog.php';
-
-
-class ilCustomUserCronCheckAccounts extends ilCronJob
+/**
+ * Customizable variant of the core "Check user accounts" cron job.
+ *
+ * It notifies users whose (time-limited) account expires within the next two
+ * weeks, using an admin-configurable subject/body per language. By extending
+ * {@see ilUserCronCheckAccounts} it reuses the core behaviour for deleting
+ * never-confirmed registrations ({@see checkNotConfirmedUserAccounts()}) and
+ * the inherited $counter.
+ *
+ * @author Fadi Asbih <asbih@elsa.uni-hannover.de>
+ */
+class ilCustomUserCronCheckAccounts extends ilUserCronCheckAccounts
 {
-    public const CRON_NAME = 'custom_check_user_accounts';
-    public const PLUGIN_ID = 'custom_acc_exp_cron';
-    protected $settings;
+    public const CRON_JOB_ID = 'custom_acc_exp_cron';
 
-    public function __construct(ilSetting $settings)
+    /** Languages that can be configured / are matched against the user pref. */
+    public const SUPPORTED_LANGUAGES = ['de', 'en'];
+
+    /** Default mail subjects per language (seeded on activation). */
+    public const DEFAULT_SUBJECT = [
+        'de' => 'Konto läuft ab',
+        'en' => 'Limited Account',
+    ];
+
+    /** Default mail bodies per language (seeded on activation). */
+    public const DEFAULT_BODY = [
+        'de' => 'Hallo {FIRSTNAME} {LASTNAME}, Ihr Konto {USERNAME} ({EMAIL}) läuft ab am: {EXPIRES}',
+        'en' => 'Hi {FIRSTNAME} {LASTNAME}, Your Account {USERNAME} ({EMAIL}) expires on: {EXPIRES}',
+    ];
+
+    private ilCustomUserCronCheckAccountsPlugin $plugin;
+    private ilSetting $plugin_settings;
+
+    public function __construct(ilCustomUserCronCheckAccountsPlugin $plugin)
     {
-        $this->settings = $settings;
+        // Initialises the core job's db/lng/log so the inherited
+        // checkNotConfirmedUserAccounts() and $counter work exactly as in core.
+        parent::__construct();
+
+        $this->plugin = $plugin;
+        $this->plugin_settings = new ilSetting(self::CRON_JOB_ID);
     }
 
     public function getId(): string
     {
-        return self::PLUGIN_ID;
+        return self::CRON_JOB_ID;
     }
 
     public function getTitle(): string
     {
-        return ilCustomUserCronCheckAccountsPlugin::getInstance()->txt(self::CRON_NAME);
+        return $this->plugin->txt('custom_check_user_accounts');
     }
 
     public function getDescription(): string
     {
-        return ilCustomUserCronCheckAccountsPlugin::getInstance()->txt("cron_description");
-    }
-
-    public function run(): ilCronJobResult
-    {
-        $customUserCronCheckAccounts = new CustomUserCronCheckAccounts($this->settings);
-        return $customUserCronCheckAccounts->run();
+        return $this->plugin->txt('cron_description');
     }
 
     public function hasAutoActivation(): bool
@@ -54,7 +77,7 @@ class ilCustomUserCronCheckAccounts extends ilCronJob
         return CronJobScheduleType::SCHEDULE_TYPE_DAILY;
     }
 
-    public function getDefaultScheduleValue(): int
+    public function getDefaultScheduleValue(): ?int
     {
         return 1;
     }
@@ -64,191 +87,174 @@ class ilCustomUserCronCheckAccounts extends ilCronJob
         return true;
     }
 
-    /**
-     * Add custom settings to form
-     *
-     * @param ilPropertyFormGUI $a_form
-     * @throws ilDateTimeException
-     */
-    public function addCustomSettingsToForm(ilPropertyFormGUI $a_form): void
-    {
-        // Language selection
-        $language_section = new ilFormSectionHeaderGUI();
-        $language_section->setTitle(ilCustomUserCronCheckAccountsPlugin::getInstance()->txt("language_selection"));
-        $a_form->addItem($language_section);
-
-        $language_switch = new ilRadioGroupInputGUI(ilCustomUserCronCheckAccountsPlugin::getInstance()->txt("language"), "language");
-        $english_option = new ilRadioOption(ilCustomUserCronCheckAccountsPlugin::getInstance()->txt("english"), "en");
-        $german_option = new ilRadioOption(ilCustomUserCronCheckAccountsPlugin::getInstance()->txt("german"), "de");
-
-        // Add English fields
-        $english_subject = new ilTextInputGUI(ilCustomUserCronCheckAccountsPlugin::getInstance()->txt("mail_subject_caption"), "mail_subject_en");
-        $english_subject->setValue($this->settings->get('mail_subject_en', ilCustomUserCronCheckAccountsPlugin::getInstance()->txt("mail_subject_content")));
-
-        // ...
-        $english_body = new ilTextAreaInputGUI(ilCustomUserCronCheckAccountsPlugin::getInstance()->txt("mail_body_caption"), "mail_body_en");
-        $english_body->setValue($this->settings->get('mail_body_en', ilCustomUserCronCheckAccountsPlugin::getInstance()->txt("mail_body_content")));
-
-        // Set the size of the textarea field (rows and columns)
-        $english_body->setRows(10); // Set the number of rows to 10 (or any desired value)
-        $english_body->setCols(50); // Set the number of columns to 50 (or any desired value)
-        // ...
-
-        $english_option->addSubItem($english_subject);
-        $english_option->addSubItem($english_body);
-
-        // Add German fields
-        $german_subject = new ilTextInputGUI(ilCustomUserCronCheckAccountsPlugin::getInstance()->txt("mail_subject_caption"), "mail_subject_de");
-        $german_subject->setValue($this->settings->get('mail_subject_de', ilCustomUserCronCheckAccountsPlugin::getInstance()->txt("mail_subject_content")));
-
-        // ...
-        $german_body = new ilTextAreaInputGUI(ilCustomUserCronCheckAccountsPlugin::getInstance()->txt("mail_body_caption"), "mail_body_de");
-        $german_body->setValue($this->settings->get('mail_body_de', ilCustomUserCronCheckAccountsPlugin::getInstance()->txt("mail_body_content")));
-
-        // Set the size of the textarea field (rows and columns)
-        $german_body->setRows(10); // Set the number of rows to 10 (or any desired value)
-        $german_body->setCols(50); // Set the number of columns to 50 (or any desired value)
-
-        // ...
-
-        $german_option->addSubItem($german_subject);
-        $german_option->addSubItem($german_body);
-
-        $language_switch->addOption($english_option);
-        $language_switch->addOption($german_option);
-        $language_switch->setValue("de"); // Set the default selected option
-
-        $a_form->addItem($language_switch);
-    }
-
-
-
-    public function saveCustomSettings(ilPropertyFormGUI $a_form): bool
-    {
-        $this->settings->set('mail_subject_de', $a_form->getInput('mail_subject_de'));
-        $this->settings->set('mail_body_de', $a_form->getInput('mail_body_de'));
-        $this->settings->set('mail_subject_en', $a_form->getInput('mail_subject_en'));
-        $this->settings->set('mail_body_en', $a_form->getInput('mail_body_en'));
-        return true;
-    }
-}
-
-
-class CustomUserCronCheckAccounts extends ilUserCronCheckAccounts
-{
     public function run(): ilCronJobResult
     {
         global $DIC;
 
-        $ilDB = $DIC['ilDB'];
-        $ilLog = $DIC['ilLog'];
+        $db = $DIC->database();
+        $log = $DIC->logger()->root();
 
         $status = ilCronJobResult::STATUS_NO_ACTION;
 
         $now = time();
-        $two_weeks_in_seconds = $now + (60 * 60 * 24 * 14); // #14630
+        $two_weeks = $now + (60 * 60 * 24 * 14); // #14630
 
-        // all users who are currently active and expire in the next 2 weeks
-        $query = "SELECT * FROM usr_data, usr_pref " .
-            "WHERE time_limit_message = '0' " .
-            "AND time_limit_unlimited = '0' " .
-            "AND time_limit_from < " . $ilDB->quote($now, "integer") . " " .
-            "AND time_limit_until > " . $ilDB->quote($now, "integer") . " " .
-            "AND time_limit_until < " . $ilDB->quote($two_weeks_in_seconds, "integer") . " " .
-            "AND usr_data.usr_id = usr_pref.usr_id " .
-            "AND keyword = " . $ilDB->quote("language", "text");
+        // All active users whose limited account expires within the next two
+        // weeks, joined with their language preference so we can pick the right
+        // mail text. Users not yet notified (time_limit_message = 0) only.
+        $query = 'SELECT ud.usr_id, ud.login, ud.firstname, ud.lastname, ud.email, '
+            . 'ud.time_limit_until, up.value AS lang_key '
+            . 'FROM usr_data ud '
+            . 'JOIN usr_pref up ON up.usr_id = ud.usr_id AND up.keyword = ' . $db->quote('language', 'text') . ' '
+            . 'WHERE ud.time_limit_message = ' . $db->quote(0, 'integer') . ' '
+            . 'AND ud.time_limit_unlimited = ' . $db->quote(0, 'integer') . ' '
+            . 'AND ud.time_limit_from < ' . $db->quote($now, 'integer') . ' '
+            . 'AND ud.time_limit_until > ' . $db->quote($now, 'integer') . ' '
+            . 'AND ud.time_limit_until < ' . $db->quote($two_weeks, 'integer');
 
-        $res = $ilDB->query($query);
+        $res = $db->query($query);
 
-        $mailService = new ilMail(ANONYMOUS_USER_ID);
+        $mail = new ilMail(ANONYMOUS_USER_ID);
 
-        while ($row = $ilDB->fetchObject($res)) {
+        while ($row = $db->fetchObject($res)) {
             $data = [
-                "firstname" => $row->firstname,
-                "lastname" => $row->lastname,
-                "expires" => $row->time_limit_until,
-                "email" => $row->email,
-                "login" => $row->login,
-                "usr_id" => $row->usr_id,
-                "language" => $row->value,
-                "owner" => $row->time_limit_owner,
+                'firstname' => (string) $row->firstname,
+                'lastname' => (string) $row->lastname,
+                'expires' => (int) $row->time_limit_until,
+                'email' => (string) $row->email,
+                'login' => (string) $row->login,
+                'usr_id' => (int) $row->usr_id,
+                'language' => (string) $row->lang_key,
             ];
 
-            $subject = $this->getCustomEmailSubject($data);
-            $body = $this->getCustomEmailBody($data);
+            if ($data['email'] === '') {
+                $log->write('Cron: (customCheckUserAccounts) skipped ' . $data['login'] . ' – no email address.');
+                continue;
+            }
 
-            // Send mail using ilMail enqueue (which is CLI/cron safe)
-            $mailService->enqueue(
-                $data['email'], // to
-                '',             // cc
-                '',             // bcc
-                $subject,
-                $body,
-                []              // attachments
+            $mail->enqueue(
+                $data['email'],
+                '',
+                '',
+                $this->buildSubject($data),
+                $this->buildBody($data),
+                []
             );
 
-            // set status 'mail sent'
-            $update = "UPDATE usr_data SET time_limit_message = '1' WHERE usr_id = " . $ilDB->quote($data['usr_id'], 'integer');
-            $ilDB->query($update);
+            // Flag the user as notified so neither this nor the core job re-sends.
+            $db->manipulateF(
+                'UPDATE usr_data SET time_limit_message = %s WHERE usr_id = %s',
+                ['integer', 'integer'],
+                [1, $data['usr_id']]
+            );
 
-            // Log mail activity
-            $ilLog->write('Cron: (checkUserAccounts()) sent message to ' . $data['login'] . '.');
-
+            $log->write('Cron: (customCheckUserAccounts) sent expiry notice to ' . $data['login'] . '.');
             $this->counter++;
         }
 
+        // Reuse the core behaviour: delete users who never confirmed their
+        // registration within the configured hash lifetime.
         $this->checkNotConfirmedUserAccounts();
 
-        if ($this->counter) {
+        if ($this->counter > 0) {
             $status = ilCronJobResult::STATUS_OK;
         }
 
         $result = new ilCronJobResult();
         $result->setStatus($status);
+
         return $result;
     }
 
-    protected function getCustomEmailBody($data)
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function buildSubject(array $data): string
     {
-        $settings = new ilSetting(ilCustomUserCronCheckAccountsPlugin::PLUGIN_ID);
+        $lang = $this->normalizeLanguage($data['language']);
+        $template = (string) $this->plugin_settings->get('mail_subject_' . $lang, self::DEFAULT_SUBJECT[$lang]);
 
-        // Get the content based on the user's language
-        if ($data['language'] == 'de') {
-            $emailBody = $settings->get('mail_body_de', ilCustomUserCronCheckAccountsPlugin::getInstance()->txt("mail_body_content"));
-        } else {
-            $emailBody = $settings->get('mail_body_en', ilCustomUserCronCheckAccountsPlugin::getInstance()->txt("mail_body_content"));
-        }
-
-        $emailBody = str_replace('{USERNAME}', $data['login'], $emailBody);
-        $emailBody = str_replace('{EMAIL}', $data['email'], $emailBody);
-        $emailBody = str_replace('{FIRSTNAME}', $data['firstname'], $emailBody);
-        $emailBody = str_replace('{LASTNAME}', $data['lastname'], $emailBody);
-        $emailBody = str_replace('{EXPIRES}', strftime('%Y-%m-%d %R', $data['expires']), $emailBody);
-
-        //$emailBody .= " " . strftime('%Y-%m-%d %R', $data['expires']);
-
-        return $emailBody;
+        return $this->applyPlaceholders($template, $data);
     }
 
-    protected function getCustomEmailSubject($data)
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function buildBody(array $data): string
     {
-        $settings = new ilSetting(ilCustomUserCronCheckAccountsPlugin::PLUGIN_ID);
+        $lang = $this->normalizeLanguage($data['language']);
+        $template = (string) $this->plugin_settings->get('mail_body_' . $lang, self::DEFAULT_BODY[$lang]);
 
-        if ($data['language'] == 'de') {
-            $emailSubject = $settings->get('mail_subject_de', ilCustomUserCronCheckAccountsPlugin::getInstance()->txt("mail_subject_content"));
-        } else {
-            $emailSubject = $settings->get('mail_subject_en', ilCustomUserCronCheckAccountsPlugin::getInstance()->txt("mail_subject_content"));
+        return $this->applyPlaceholders($template, $data);
+    }
+
+    /**
+     * Map an arbitrary user language key onto a supported language, defaulting
+     * to English for anything we do not explicitly translate.
+     */
+    private function normalizeLanguage(string $language): string
+    {
+        return in_array($language, self::SUPPORTED_LANGUAGES, true) ? $language : 'en';
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function applyPlaceholders(string $text, array $data): string
+    {
+        // strftime() was deprecated in PHP 8.1 and removed in 8.4 – use date().
+        return strtr($text, [
+            '{USERNAME}' => (string) $data['login'],
+            '{EMAIL}' => (string) $data['email'],
+            '{FIRSTNAME}' => (string) $data['firstname'],
+            '{LASTNAME}' => (string) $data['lastname'],
+            '{EXPIRES}' => date('Y-m-d H:i', (int) $data['expires']),
+        ]);
+    }
+
+    public function addCustomSettingsToForm(ilPropertyFormGUI $a_form): void
+    {
+        $section = new ilFormSectionHeaderGUI();
+        $section->setTitle($this->plugin->txt('language_selection'));
+        $a_form->addItem($section);
+
+        $language_switch = new ilRadioGroupInputGUI($this->plugin->txt('language'), 'language');
+
+        foreach (self::SUPPORTED_LANGUAGES as $lang) {
+            $option = new ilRadioOption(
+                $this->plugin->txt($lang === 'de' ? 'german' : 'english'),
+                $lang
+            );
+
+            $subject = new ilTextInputGUI($this->plugin->txt('mail_subject_caption'), 'mail_subject_' . $lang);
+            $subject->setInfo($this->plugin->txt('mail_subject_info'));
+            $subject->setValue((string) $this->plugin_settings->get('mail_subject_' . $lang, self::DEFAULT_SUBJECT[$lang]));
+            $subject->setSize(80);
+
+            $body = new ilTextAreaInputGUI($this->plugin->txt('mail_body_caption'), 'mail_body_' . $lang);
+            $body->setInfo($this->plugin->txt('mail_body_info'));
+            $body->setValue((string) $this->plugin_settings->get('mail_body_' . $lang, self::DEFAULT_BODY[$lang]));
+            $body->setRows(10);
+            $body->setCols(80);
+
+            $option->addSubItem($subject);
+            $option->addSubItem($body);
+            $language_switch->addOption($option);
         }
 
-        $emailSubject = str_replace('{USERNAME}', $data['login'], $emailSubject);
-        $emailSubject = str_replace('{EMAIL}', $data['email'], $emailSubject);
-        $emailSubject = str_replace('{FIRSTNAME}', $data['firstname'], $emailSubject);
-        $emailSubject = str_replace('{LASTNAME}', $data['lastname'], $emailSubject);
-        $emailSubject = str_replace('{EXPIRES}', strftime('%Y-%m-%d %R', $data['expires']), $emailSubject);
+        // Default selection only governs which block is expanded first; both
+        // languages' fields are always submitted and saved.
+        $language_switch->setValue('de');
+        $a_form->addItem($language_switch);
+    }
 
-        return $emailSubject;
+    public function saveCustomSettings(ilPropertyFormGUI $a_form): bool
+    {
+        foreach (self::SUPPORTED_LANGUAGES as $lang) {
+            $this->plugin_settings->set('mail_subject_' . $lang, (string) $a_form->getInput('mail_subject_' . $lang));
+            $this->plugin_settings->set('mail_body_' . $lang, (string) $a_form->getInput('mail_body_' . $lang));
+        }
+
+        return true;
     }
 }
-
-
-
