@@ -25,10 +25,10 @@ v1.0.12
 
 
 ## Installation
-In your {ILIAS Root} directory
+In your {ILIAS Root} directory (in ILIAS 10 `Customizing/` lives under `public/`)
 ```bash
-mkdir -p Customizing/global/plugins/Services/Cron/CronHook
-cd Customizing/global/plugins/Services/Cron/CronHook
+mkdir -p public/Customizing/global/plugins/Services/Cron/CronHook
+cd public/Customizing/global/plugins/Services/Cron/CronHook
 git clone https://github.com/iFadi/CustomUserCronCheckAccounts.git
 ```
 
@@ -48,10 +48,10 @@ After activating the plugin, a new cronjob "Customizable - Check user accounts" 
 * {EXPIRES}
 
 ## Tested on the following ILIAS Versions:
-* v9.0
-* v9.99
+* v10.0
+* v10.999
 
-PS: For older ILIAS versions, you can choose to use older tags/versions of the plugin.
+PS: For ILIAS 9 use the `v1.x` tags/releases of the plugin. In ILIAS 10 the plugin lives under `public/Customizing/global/plugins/...` and is registered via `php cli/setup.php build` + `php cli/setup.php update`.
 
 ## Maintainer
 [ZQS/elsa - Leibniz Universität Hannover](https://www.zqs.uni-hannover.de/de/zqs/team-kontakt/elsa/), [elearning@uni-hannover.de](mailto:elearning@uni-hannover.de)

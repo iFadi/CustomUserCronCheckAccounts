@@ -7,12 +7,12 @@
 
 <!-- language file start -->
 custom_check_user_accounts#:#Anpassbar - ILIAS-Konten überprüfen
-cron_description#:#Personen, deren ILIAS-Konten zeitlich begrenzt sind, werden zwei Wochen vor Fristende per E-Mail informiert, dass ihr Konto abläuft. Außerdem löscht der Cronjob alle ILIAS-Konten, bei denen der E-Mail-Bestätigungslink nicht fristgerecht angeklickt wurde.
-mail_subject_caption#:#E-Mail Betreff
-mail_subject_info#:#Betreff für den Mail
+cron_description#:#Personen, deren ILIAS-Konten zeitlich begrenzt sind, werden zwei Wochen vor Fristende per E-Mail darüber informiert, dass ihr Konto abläuft. Außerdem löscht der Cronjob alle ILIAS-Konten, bei denen der E-Mail-Bestätigungslink nicht fristgerecht angeklickt wurde.
+mail_subject_caption#:#E-Mail-Betreff
+mail_subject_info#:#Betreff der Benachrichtigungs-E-Mail.
 mail_subject_content#:#Konto läuft ab
-mail_body_caption#:#E-Mail Nachricht
-mail_body_info#:#Diese Variablen 'FIRSTNAME' 'LASTNAME' 'USERNAME' 'EMAIL' 'EXPIRES' können benutzt werden
+mail_body_caption#:#E-Mail-Nachricht
+mail_body_info#:#Folgende Platzhalter können verwendet werden: {FIRSTNAME} {LASTNAME} {USERNAME} {EMAIL} {EXPIRES}
 mail_body_content#:#Hallo {FIRSTNAME} {LASTNAME}, Ihr Konto {USERNAME} ({EMAIL}) läuft ab am: {EXPIRES}
 language_selection#:#Sprachauswahl
 language#:#Sprache
